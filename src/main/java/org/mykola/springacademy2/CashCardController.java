@@ -18,6 +18,7 @@ public class CashCardController {
     @GetMapping("/{requestedId}")
     public ResponseEntity<CashCard> findById(@PathVariable Long requestedId) {
         if (requestedId.equals(99L)) {
+            CashCard card=new CashCard(100L,145.67);
             CashCard cashCard = new CashCard(99L, 123.45);
             return ResponseEntity.ok(cashCard);
         } else {
