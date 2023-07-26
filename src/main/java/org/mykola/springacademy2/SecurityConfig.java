@@ -14,11 +14,39 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests()
+                .requestMatchers("/cashcards/**")
+                .hasRole("CARD-OWNER") // enable RBAC: Replace the .authenticated() code with this line.
+//                .authenticated()
+                .and()
+                .csrf().disable()
+                .httpBasic();
         return http.build();
     }
+
+    @Bean
+    public UserDetailsService testOnlyUsers(PasswordEncoder passwordEncoder) {
+        User.UserBuilder users = User.builder();
+//        UserDetails sarah = users
+//                .username("sarah1")
+//                .password(passwordEncoder.encode("abc123"))
+//                .roles() // No roles for now
+//                .build();
+        UserDetails sarah = users
+                .username("sarah1")
+                .password(passwordEncoder.encode("abc123"))
+                .roles("CARD-OWNER") // new role
+                .build();
+        UserDetails hankOwnsNoCards = users
+                .username("hank-owns-no-cards")
+                .password(passwordEncoder.encode("qrs456"))
+                .roles("NON-OWNER") // new role
+                .build();
+        return new InMemoryUserDetailsManager(sarah,hankOwnsNoCards);
+    }
 //
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
